@@ -42,10 +42,4 @@ jspm_packages
 # JavaScript files
 app/**/*.js
 app/**/*.js.map
-.idea/angular2-intro.iml
-.idea/dbnavigator.xml
-.idea/inspectionProfiles/
-.idea/misc.xml
-.idea/modules.xml
-.idea/workspace.xml
 .idea/

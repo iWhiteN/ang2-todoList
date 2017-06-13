@@ -1,28 +1,58 @@
-import {todos} from './data';
+import {Injectable} from '@angular/core';
+import {Http, Headers, RequestOptions} from '@angular/http';
+import {Observable} from "rxjs/Observable";
+
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
+
+
 import {Todo} from './todo';
 
-
+@Injectable()
 export class TodoService {
-    todos: Todo[] = todos;
+    private apiUrl = 'api/todos';
 
-    getTodos(): Todo[] {
-        return this.todos;
+    constructor(private http: Http) {
     }
 
-    cteateTodo(title: string) {
+
+    getTodos(): Observable<Todo[]> {
+        return this.http.get(this.apiUrl)
+            .map(res => res.json().data as Todo[])
+            .catch(this.handleError)
+    }
+
+    createTodo(title: string) {
+        let headers = new Headers({'Content-Type': 'application/json'});
+        let options = new RequestOptions({headers});
         let todo = new Todo(title);
-        this.todos.push(todo);
+
+        return this.http.post(this.apiUrl, todo, options)
+            .map(res => res.json().data  as Todo)
+            .catch(this.handleError);
     }
 
     deleteTodo(todo: Todo) {
-        let index = this.todos.indexOf(todo);
+        let headers = new Headers({'Content-Type': 'application/json'});
+        let options = new RequestOptions({headers});
+        let url = `${this.apiUrl}/${todo.id}`;
 
-        if (index > -1) {
-            this.todos.splice(index, 1);
-        }
+        return this.http.delete(url, headers)
+            .catch(this.handleError);
     }
 
     toggleTodo(todo: Todo) {
-        todo.completed = !todo.completed;
+        let headers = new Headers({'Content-Type': 'application/json'});
+        let options = new RequestOptions({headers});
+        let url = `${this.apiUrl}/${todo.id}`;
+
+        return this.http.put(url, todo, options)
+            .catch(this.handleError);
+    }
+
+    private handleError(error: any) {
+        console.log('Произошла ошибка', error);
+        return Observable.throw(error.message || error);
     }
 }
